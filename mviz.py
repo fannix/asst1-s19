@@ -3,7 +3,7 @@
 # Visualize images of Mandelbrot set
 
 from PIL import Image, ImageTk
-import Tkinter
+import tkinter
 
 import os
 import sys
@@ -66,22 +66,22 @@ class MandelImage:
 
     def __init__(self, commandLine = ''):
         self.commandList = commandLine.split()
-        self.tk = Tkinter.Tk()
-        self.canvas = Tkinter.Canvas(self.tk, bg="black")
+        self.tk = tkinter.Tk()
+        self.canvas = tkinter.Canvas(self.tk, bg="black")
         self.canvas.config(width=self.width, height=self.height)
-        self.canvas.pack(side=Tkinter.TOP)
+        self.canvas.pack(side=tkinter.TOP)
         self.currentField = self.homeField
         self.help()
 
     def help(self):
-        print "Keyboard commands:"
-        print " + Zoom in"
-        print " - Zoom out"
-        print " l Shift left"
-        print " r Shift right"
-        print " u Shift up"
-        print " d Shift down"
-        print " q Quit"
+        print("Keyboard commands:")
+        print(" + Zoom in")
+        print(" - Zoom out")
+        print(" l Shift left")
+        print(" r Shift right")
+        print(" u Shift up")
+        print(" d Shift down")
+        print(" q Quit")
 
     def displayImage(self, image):
         saveIndex = self.currentIndex
@@ -103,7 +103,7 @@ class MandelImage:
         dt = datetime.datetime.now() - start
         tpi = dt/ntimes
         msecs = tpi.seconds/1000.0 + 1e-3*tpi.microseconds
-        print "%.2f ms/image" % msecs
+        print("%.2f ms/image" % msecs)
 
     def getImage(self):
         # Tell generator what we want:
@@ -113,12 +113,12 @@ class MandelImage:
             p = subprocess.Popen(clist, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             (stdoutData, stderrData) = p.communicate()
         except Exception as ex:
-            print "Couldn't run command '%s' (%s)" % (" ".join(clist), ex)
+            print("Couldn't run command '%s' (%s)" % (" ".join(clist), ex))
             return None
         try:
             im = Image.open(self.imageFile)
         except Exception as ex:
-            print "Couldn't open image file '%s' (%s)" % (self.imageFile, ex)
+            print("Couldn't open image file '%s' (%s)" % (self.imageFile, ex))
             return None
         return im
         
@@ -219,7 +219,7 @@ class MandelImage:
             elif cmd == 'h':
                 self.home()
             else:
-                print "Unknown command '%s'" % cmd
+                print("Unknown command '%s'" % cmd)
         sys.exit(0)
 
 def run(name, args):
