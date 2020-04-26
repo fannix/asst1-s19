@@ -44,8 +44,6 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-
-
 // Core computation of Mandelbrot set membershop
 // Iterate complex number c to determine whether it diverges
 int mandel_ref(float c_re, float c_im, int count)
@@ -53,12 +51,13 @@ int mandel_ref(float c_re, float c_im, int count)
     float z_re = c_re, z_im = c_im;
     int i;
 
-    for (i = 0; i < count; ++i) {
+    for (i = 0; i < count; ++i)
+    {
 
         if (z_re * z_re + z_im * z_im > 4.f)
             break;
 
-        float new_re = z_re*z_re - z_im*z_im;
+        float new_re = z_re * z_re - z_im * z_im;
         float new_im = 2.f * z_re * z_im;
         z_re = c_re + new_re;
         z_im = c_im + new_im;
@@ -72,65 +71,70 @@ int mandel_ref(float c_re, float c_im, int count)
 // (small) array of numbers.  When instantiated with an unrolling
 // factor, GCC will unroll the loops involving the index k, yielding
 // code that exploits ILP.
-#define MANDEL_BODY(ufactor) {                                                 \
-    const int unroll = ufactor;					               \
-    float z_re[unroll], z_im[unroll];                                          \
-    float new_re[unroll], new_im[unroll];			               \
-    bool done[unroll];                                                         \
-    int icount[unroll];                                                        \
-    for (int k = 0; k < unroll; k++) {                                         \
-	z_re[k] = c_re[k];                                                     \
-	z_im[k] = c_im[k];                                                     \
-	done[k] = false;                                                       \
-	icount[k] = 0;                                                         \
-    }                                                                          \
-    int i;                                                                     \
-    for (i = 0; i < count; ++i) {                                              \
-	bool allDone = true;                                                   \
-	for (int k = 0; k < unroll; k++) {                                     \
-	    icount[k] = done[k] ? icount[k] : i;                               \
-	    done[k] = done[k] | (z_re[k] * z_re[k] + z_im[k] * z_im[k] > 4.f); \
-	    allDone = allDone & done[k];                                       \
-	}                                                                      \
-	if (allDone)                                                           \
-	    break;                                                             \
-	for (int k = 0; k < unroll; k++) {                                     \
-	    new_re[k] = z_re[k] * z_re[k] - z_im[k] * z_im[k];                 \
-	    new_im[k] = 2.f * z_re[k] * z_im[k];                               \
-	    z_re[k] = c_re[k] + new_re[k];                                     \
-	    z_im[k] = c_im[k] + new_im[k];                                     \
-	}                                                                      \
-    }                                                                          \
-    for (int k = 0; k < unroll; k++) {                                         \
-	iters[k] = done[k] ? icount[k] : i;                                    \
-    }                                                                          \
-}
+#define MANDEL_BODY(ufactor)                                                       \
+    {                                                                              \
+        const int unroll = ufactor;                                                \
+        float z_re[unroll], z_im[unroll];                                          \
+        float new_re[unroll], new_im[unroll];                                      \
+        bool done[unroll];                                                         \
+        int icount[unroll];                                                        \
+        for (int k = 0; k < unroll; k++)                                           \
+        {                                                                          \
+            z_re[k] = c_re[k];                                                     \
+            z_im[k] = c_im[k];                                                     \
+            done[k] = false;                                                       \
+            icount[k] = 0;                                                         \
+        }                                                                          \
+        int i;                                                                     \
+        for (i = 0; i < count; ++i)                                                \
+        {                                                                          \
+            bool allDone = true;                                                   \
+            for (int k = 0; k < unroll; k++)                                       \
+            {                                                                      \
+                icount[k] = done[k] ? icount[k] : i;                               \
+                done[k] = done[k] | (z_re[k] * z_re[k] + z_im[k] * z_im[k] > 4.f); \
+                allDone = allDone & done[k];                                       \
+            }                                                                      \
+            if (allDone)                                                           \
+                break;                                                             \
+            for (int k = 0; k < unroll; k++)                                       \
+            {                                                                      \
+                new_re[k] = z_re[k] * z_re[k] - z_im[k] * z_im[k];                 \
+                new_im[k] = 2.f * z_re[k] * z_im[k];                               \
+                z_re[k] = c_re[k] + new_re[k];                                     \
+                z_im[k] = c_im[k] + new_im[k];                                     \
+            }                                                                      \
+        }                                                                          \
+        for (int k = 0; k < unroll; k++)                                           \
+        {                                                                          \
+            iters[k] = done[k] ? icount[k] : i;                                    \
+        }                                                                          \
+    }
 
 // Versions of the code with different levels of parallelism
 void mandel_par1(float *c_re, float *c_im, int count, int *iters)
-MANDEL_BODY(1)
+    MANDEL_BODY(1)
 
 void mandel_par2(float *c_re, float *c_im, int count, int *iters)
-MANDEL_BODY(2)
+    MANDEL_BODY(2)
 
 void mandel_par3(float *c_re, float *c_im, int count, int *iters)
-MANDEL_BODY(3)
-
+    MANDEL_BODY(3)
+        
 void mandel_par4(float *c_re, float *c_im, int count, int *iters)
-MANDEL_BODY(4)
+    MANDEL_BODY(4)
 
 void mandel_par5(float *c_re, float *c_im, int count, int *iters)
-MANDEL_BODY(5)
+    MANDEL_BODY(5)
 
 // Information about the different benchmarks
 par_info par_funs[] =
-   {{ 1, mandel_par1, "ILP parallelism x1" },
-    { 2, mandel_par2, "ILP parallelism x2" },
-    { 3, mandel_par3, "ILP parallelism x3" },
-    { 4, mandel_par4, "ILP parallelism x4" },
-    { 5, mandel_par5, "ILP parallelism x5" },
-    { 0, NULL, "" }
-   };
+    {{1, mandel_par1, "ILP parallelism x1"},
+        {2, mandel_par2, "ILP parallelism x2"},
+        {3, mandel_par3, "ILP parallelism x3"},
+        {4, mandel_par4, "ILP parallelism x4"},
+        {5, mandel_par5, "ILP parallelism x5"},
+        {0, NULL, ""}};
 
 //
 // MandelbrotSerial --
@@ -146,11 +150,11 @@ par_info par_funs[] =
 //
 // Returns total number of iterations across all compuations
 long mandelbrotSerial(mandel_fun mfun,
-		      float x0, float y0, float x1, float y1,
-		      int width, int height,
-		      int startRow, int totalRows,
-		      int maxIterations,
-		      int output[])
+                      float x0, float y0, float x1, float y1,
+                      int width, int height,
+                      int startRow, int totalRows,
+                      int maxIterations,
+                      int output[])
 {
     float dx = (x1 - x0) / width;
     float dy = (y1 - y0) / height;
@@ -159,15 +163,17 @@ long mandelbrotSerial(mandel_fun mfun,
 
     long numIters = 0;
 
-    for (int j = startRow; j < endRow; j++) {
-        for (int i = 0; i < width; ++i) {
+    for (int j = startRow; j < endRow; j++)
+    {
+        for (int i = 0; i < width; ++i)
+        {
             float x = x0 + i * dx;
             float y = y0 + j * dy;
 
             int index = (j * width + i);
-	    int iters = mfun(x, y, maxIterations);
-	    numIters += iters;
-	    output[index] = iters;
+            int iters = mfun(x, y, maxIterations);
+            numIters += iters;
+            output[index] = iters;
         }
     }
     return numIters;
@@ -190,12 +196,12 @@ long mandelbrotSerial(mandel_fun mfun,
 //
 // Returns total number of iterations across all compuations
 long mandelbrotParallel(mandel_par_fun mfun,
-		      int unrollCount,
-		      float x0, float y0, float x1, float y1,
-		      int width, int height,
-		      int startRow, int totalRows,
-		      int maxIterations,
-		      int output[])
+                        int unrollCount,
+                        float x0, float y0, float x1, float y1,
+                        int width, int height,
+                        int startRow, int totalRows,
+                        int maxIterations,
+                        int output[])
 {
     float dx = (x1 - x0) / width;
     float dy = (y1 - y0) / height;
@@ -206,36 +212,42 @@ long mandelbrotParallel(mandel_par_fun mfun,
 
     int j;
 
-    for (j = startRow; j <= endRow-unrollCount; j+= unrollCount) {
-	// Process unrollCount rows in a single pass
-	float x[unrollCount];
-	float y[unrollCount];
-	int iters[unrollCount];
-        for (int i = 0; i < width; ++i) {
-	    for (int k = 0; k < unrollCount; k++) {
-		x[k] = x0 + i * dx;
-		y[k] = y0 + (j+k) * dy;
-		iters[k] = 0;
-	    }
-	    mfun(x, y, maxIterations, iters);
-	    for (int k = 0; k < unrollCount; k++) {
-		int index = ((j+k) * width + i);
-		output[index] = iters[k];
-		numIters += iters[k];
-	    }
+    for (j = startRow; j <= endRow - unrollCount; j += unrollCount)
+    {
+        // Process unrollCount rows in a single pass
+        float x[unrollCount];
+        float y[unrollCount];
+        int iters[unrollCount];
+        for (int i = 0; i < width; ++i)
+        {
+            for (int k = 0; k < unrollCount; k++)
+            {
+                x[k] = x0 + i * dx;
+                y[k] = y0 + (j + k) * dy;
+                iters[k] = 0;
+            }
+            mfun(x, y, maxIterations, iters);
+            for (int k = 0; k < unrollCount; k++)
+            {
+                int index = ((j + k) * width + i);
+                output[index] = iters[k];
+                numIters += iters[k];
+            }
         }
     }
 
     // Complete any leftover rows using reference implementation
-    for (; j < endRow; j++) {
-        for (int i = 0; i < width; ++i) {
+    for (; j < endRow; j++)
+    {
+        for (int i = 0; i < width; ++i)
+        {
             float x = x0 + i * dx;
             float y = y0 + j * dy;
 
             int index = (j * width + i);
-	    int iters = mandel_ref(x, y, maxIterations);
-	    numIters += iters;
-	    output[index] = iters;
+            int iters = mandel_ref(x, y, maxIterations);
+            numIters += iters;
+            output[index] = iters;
         }
     }
 

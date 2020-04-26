@@ -45,3 +45,12 @@ prob1_mandelbrot_threads/mandelbrot-v1-thread-4.ppm
 prob1_mandelbrot_threads/mandelbrot-v2-serial.ppm
 prob1_mandelbrot_threads/mandelbrot-v2-thread-4.ppm
 prob2_vecintrin/vrun
+prob3_mandelbrot_ilp/mandelbrot
+.gitignore
+handin.tar
+prob3_mandelbrot_ilp/mandelbrot-v3-par1.ppm
+prob3_mandelbrot_ilp/mandelbrot-v3-par2.ppm
+prob3_mandelbrot_ilp/mandelbrot-v3-par3.ppm
+prob3_mandelbrot_ilp/mandelbrot-v3-par4.ppm
+prob3_mandelbrot_ilp/mandelbrot-v3-par5.ppm
+prob3_mandelbrot_ilp/mandelbrot-v3-ref.ppm
