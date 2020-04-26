@@ -30,3 +30,17 @@
 *.exe
 *.out
 *.app
+mviz.patch
+prob1_mandelbrot_threads/mandelbrot
+prob1_mandelbrot_threads/mandelbrot-v0-serial.ppm
+prob1_mandelbrot_threads/mandelbrot-v0-thread-2.ppm
+prob1_mandelbrot_threads/mandelbrot-v0-thread-4.ppm
+prob1_mandelbrot_threads/mandelbrot-v0-thread-8.ppm
+prob1_mandelbrot_threads/mandelbrot-v0-thread-16.ppm
+prob1_mandelbrot_threads/mandelbrot-v1-serial.ppm
+prob1_mandelbrot_threads/mandelbrot-v1-thread-1.ppm
+prob1_mandelbrot_threads/mandelbrot-v1-thread-2.ppm
+prob1_mandelbrot_threads/mandelbrot-v1-thread-3.ppm
+prob1_mandelbrot_threads/mandelbrot-v1-thread-4.ppm
+prob1_mandelbrot_threads/mandelbrot-v2-serial.ppm
+prob1_mandelbrot_threads/mandelbrot-v2-thread-4.ppm
