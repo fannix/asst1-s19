@@ -107,6 +107,9 @@ void clampedExpVector(float *values, int *exponents, float *output, int N)
 
 	maskAll = _cmu418_init_ones();
 	for (int i = 0; i < N; i += VECTOR_WIDTH) {
+		if (i + VECTOR_WIDTH > N) {
+			maskAll = _cmu418_init_ones(leftOver);
+		}
 		result = _cmu418_vset_float(1.f);
 
 		_cmu418_vload_float(xpower, values + i, maskAll);
