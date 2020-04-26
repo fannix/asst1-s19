@@ -56,8 +56,8 @@ static inline void mandel_par2(float c_re0, float c_im0, float c_re1, float c_im
         done0 = done0 | (z_re0*z_re0 + z_im0*z_im0 > 4.f);
         done1 = done1 | (z_re1*z_re1 + z_im1*z_im1 > 4.f);
 	
-	if (done0 & done1)
-	    break;
+        if (done0 & done1)
+            break;
 
         float new_re0 = z_re0*z_re0 - z_im0*z_im0;
         float new_re1 = z_re1*z_re1 - z_im1*z_im1;
@@ -92,6 +92,29 @@ export void mandelbrot_ispc_par2(uniform float x0, uniform float y0,
     // You should handle the case where the height is not a multiple
     // of 2.
 
+    uniform int halfHeight = height / 2;
+    uniform int leftOver = height % 2;
+
+    foreach (j = 0 ... halfHeight, i = 0 ... width) {
+        float re = x0 + i * dx;
+        float im0 = y0 + (2 * j) * dy; 
+        float im1 = y0 + (2 * j + 1) * dy;
+
+        int index0 = (2 * j) * width + i;
+        int index1 = (2 * j + 1) * width + i;
+
+        mandel_par2(re, im0, re, im1, maxIterations, &output[index0], &output[index1]);
+    }
+
+    if (leftOver) {
+        foreach(i = 0 ... width) {
+            float x = x0 + i * dx;
+            float y = y0 + (height - 1) * dy;
+
+            int index = (height - 1) * width + i;
+            output[index] = mandel(x, y, maxIterations);
+        }
+    }
 }
 
 
@@ -135,8 +158,8 @@ export void mandelbrot_ispc_withtasks(uniform float x0, uniform float y0,
 
     // create a bunch of tasks
     launch[taskCount] mandelbrot_ispc_task(x0, y0, x1, y1,
-                                         width, height,
-    					 rowsPerTask,
-                                         maxIterations,
-                                         output); 
+                                          width, height,
+    					                  rowsPerTask,
+                                          maxIterations,
+                                          output); 
 }
